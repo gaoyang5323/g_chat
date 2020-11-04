@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>chat</title>
+</head>
+<body>
+<div>
+    <textarea style="height: 200px;width: 300px" id="history_content"></textarea>
+</div>
+<div>
+    <select id="token">
+        <option>01</option>
+        <option>02</option>
+        <option>03</option>
+        <option>04</option>
+        <option>05</option>
+        <option>10</option>
+        <option>20</option>
+    </select>
+
+    <input type="text" id="content"></input>
+
+    <select id="recipientId">
+        <option>01</option>
+        <option>02</option>
+        <option>03</option>
+        <option>04</option>
+        <option>05</option>
+        <option>10</option>
+        <option>20</option>
+    </select>
+    <input type="file" multiple="multiple" style="width: 70px" id="upload" onchange="imgSend()"></input>
+    <button onclick="loginWs()">登录ws</button>
+    <button onclick="send()">发送</button>
+    <span id="status"></span>
+    <img id="img" height="90px" width="90px">
+    <!--  <div style="border: 1px solid #CCC;height: 300px;overflow: scroll" id="server-msg-container">-->
+</div>
+
+
+<script>
+    let wsStatus = 0;
+    let ws;
+
+    function loginWs() {
+        let token = document.getElementById('token');
+        let tokenVal = token.options[token.selectedIndex].text
+        ws = webSocket(tokenVal)
+        start()
+    }
+
+    function imgSend() {
+        let files = document.getElementById('upload').files
+        if (!files || !files[0]) {
+            statusMsg("没有要上传的文件")
+            return
+        }
+        let fileReader = new FileReader()
+        fileReader.readAsArrayBuffer(files[0])
+        fileReader.onload = function (event) {
+            var result = event.target.result;
+            var blob = new Blob([int2Byte(2), result]);
+            ws.send(blob)
+        }
+    }
+
+    function int2Byte(x) {
+        var arrayBuffer = new ArrayBuffer(4);
+        var dataView = new DataView(arrayBuffer);
+        dataView.setInt32(0, x);
+        return arrayBuffer;
+    }
+
+    function send() {
+        let input = document.getElementById('content')
+        let recipientId = document.getElementById('recipientId')
+        let val = input.value
+        let recipientIdVal = recipientId.options[recipientId.selectedIndex].text
+
+        if (val.trim() == '') {
+            statusMsg('不能发送空内容')
+            return
+        }
+        if (recipientIdVal.trim() == '' || recipientIdVal === '接收人id') {
+            statusMsg('接收人id不能为空')
+            return
+        }
+        if (wsStatus != 1) {
+            statusMsg('websocket未连接')
+            return
+        }
+        var blob = new Blob([int2Byte(100), recipientIdVal, val]);
+        ws.send(blob)
+        input.value = ''
+    }
+
+    function webSocket(token) {
+        if ("WebSocket" in window) {
+            statusMsg("支持websocket")
+            //return new WebSocket("ws://47.92.244.187:9898/chat?token=gaoyang"); //创建WebSocket连接
+            return new WebSocket("ws://localhost:9898/chat?token=" + token); //创建WebSocket连接
+        } else {
+            alert("不支持websocket")
+        }
+    }
+
+    function start() {
+        ws.onopen = function () {
+            statusMsg('成功连接')
+            wsStatus = 1;
+        }
+        ws.onmessage = function (e) {
+            if (typeof e.data === "string") {
+                let history = document.getElementById('history_content')
+                history.value = history.value + e.data + '\n'
+            } else {
+                // var result = e.data;
+                // var imgSrc = document.getElementById("img");
+                // var imageReader = new FileReader();
+                // imageReader.readAsDataURL(result);
+                // imageReader.onload = function (img) {
+                //     imgSrc.src = img.target.result
+                // };
+                let binData = e.data
+                let type = binData.slice(0, 4)
+
+                let binReaderType = new FileReader()
+                binReaderType.readAsArrayBuffer(type)
+                binReaderType.onload = function (event) {
+                    let dataView = new DataView(event.target.result)
+                    let history = document.getElementById('history_content')
+                    history.value = history.value + dataView.getInt32(0) + '\n'
+                }
+
+                let msg = binData.slice(4)
+                let binReaderMsg = new FileReader()
+                binReaderMsg.readAsText(msg)
+                binReaderMsg.onload = function (event) {
+                    let history = document.getElementById('history_content')
+                    history.value = history.value + binReaderMsg.result + '\n'
+                }
+            }
+        }
+        ws.onclose = function (e) {
+            statusMsg('关闭连接')
+            wsStatus = 0;
+        }
+        ws.onerror = function (e) {
+            statusMsg('发生错误')
+            wsStatus = 0;
+        }
+    }
+
+    function statusMsg(e) {
+        document.getElementById('status').innerText = e
+    }
+</script>
+</body>
+</html>
