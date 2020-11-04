@@ -40,18 +40,14 @@ public final class NettyUtil {
             return;
         }
         ByteBuf resultbuffer = Unpooled.buffer();
-        try {
-            Channel channel = ALL_USERID_CHANNEL.get(recipientId);
-            if (sendOffLine(ctx, resultbuffer, channel)) {
-                return;
-            }
-            resultbuffer.writeInt(WebSocketMessageTypeEnum.TEXT_MESSAGE.getType());
-            resultbuffer.writeBytes(senderId.getBytes());
-            resultbuffer.writeBytes(message.getBytes());
-            channel.writeAndFlush(new BinaryWebSocketFrame(resultbuffer));
-        } finally {
-            ReferenceCountUtil.release(resultbuffer);
+        Channel channel = ALL_USERID_CHANNEL.get(recipientId);
+        if (sendOffLine(ctx, resultbuffer, channel)) {
+            return;
         }
+        resultbuffer.writeInt(WebSocketMessageTypeEnum.TEXT_MESSAGE.getType());
+        resultbuffer.writeBytes(senderId.getBytes());
+        resultbuffer.writeBytes(message.getBytes());
+        channel.writeAndFlush(new BinaryWebSocketFrame(resultbuffer));
     }
 
     //发送二进制信息
@@ -60,22 +56,18 @@ public final class NettyUtil {
             return;
         }
         ByteBuf resultbuffer = Unpooled.buffer();
-        try {
-            Channel channel = ALL_USERID_CHANNEL.get(recipientId);
-            if (sendOffLine(ctx, resultbuffer, channel)) {
-                return;
-            }
-            if (isImage) {
-                resultbuffer.writeInt(WebSocketMessageTypeEnum.IMG_MESSAGE.getType());
-            } else {
-                resultbuffer.writeInt(WebSocketMessageTypeEnum.FILE_MESSAGE.getType());
-            }
-            resultbuffer.writeBytes(senderId.getBytes());
-            resultbuffer.writeBytes(content);
-            channel.writeAndFlush(new BinaryWebSocketFrame(resultbuffer));
-        } finally {
-            ReferenceCountUtil.release(resultbuffer);
+        Channel channel = ALL_USERID_CHANNEL.get(recipientId);
+        if (sendOffLine(ctx, resultbuffer, channel)) {
+            return;
         }
+        if (isImage) {
+            resultbuffer.writeInt(WebSocketMessageTypeEnum.IMG_MESSAGE.getType());
+        } else {
+            resultbuffer.writeInt(WebSocketMessageTypeEnum.FILE_MESSAGE.getType());
+        }
+        resultbuffer.writeBytes(senderId.getBytes());
+        resultbuffer.writeBytes(content);
+        channel.writeAndFlush(new BinaryWebSocketFrame(resultbuffer));
     }
 
     private static boolean sendOffLine(ChannelHandlerContext ctx, ByteBuf Resultbuffer, Channel channel) {

@@ -98,7 +98,7 @@
     function webSocket(token) {
         if ("WebSocket" in window) {
             statusMsg("支持websocket")
-            //return new WebSocket("ws://47.92.244.187:9898/chat?token=gaoyang"); //创建WebSocket连接
+            // return new WebSocket("ws://47.92.244.187:9898/chat?token=" + token); //创建WebSocket连接
             return new WebSocket("ws://localhost:9898/chat?token=" + token); //创建WebSocket连接
         } else {
             alert("不支持websocket")
@@ -115,31 +115,32 @@
                 let history = document.getElementById('history_content')
                 history.value = history.value + e.data + '\n'
             } else {
-                // var result = e.data;
-                // var imgSrc = document.getElementById("img");
-                // var imageReader = new FileReader();
-                // imageReader.readAsDataURL(result);
-                // imageReader.onload = function (img) {
-                //     imgSrc.src = img.target.result
-                // };
                 let binData = e.data
                 let type = binData.slice(0, 4)
-
-                let binReaderType = new FileReader()
-                binReaderType.readAsArrayBuffer(type)
-                binReaderType.onload = function (event) {
-                    let dataView = new DataView(event.target.result)
-                    let history = document.getElementById('history_content')
-                    history.value = history.value + dataView.getInt32(0) + '\n'
-                }
-
-                let msg = binData.slice(4)
-                let binReaderMsg = new FileReader()
-                binReaderMsg.readAsText(msg)
-                binReaderMsg.onload = function (event) {
-                    let history = document.getElementById('history_content')
-                    history.value = history.value + binReaderMsg.result + '\n'
-                }
+                let senderId = binData.slice(4, 6)
+                let message = binData.slice(6)
+                new Promise(resolve => {
+                    let reader = new FileReader()
+                    reader.readAsArrayBuffer(type)
+                    reader.onload = function (event) {
+                        resolve('消息类型: ' + new DataView(event.target.result).getInt32(0) + '|')
+                    }
+                }).then((type) => {
+                    new Promise(resolve => {
+                        let reader = new FileReader()
+                        reader.readAsText(senderId)
+                        reader.onload = function (event) {
+                            resolve(type + '发送人为: ' + event.target.result + '|')
+                        }
+                    }).then((senderId => {
+                        let reader = new FileReader()
+                        reader.readAsText(message)
+                        reader.onload = function (event) {
+                            let history = document.getElementById('history_content')
+                            history.value = history.value + senderId + '内容: ' + event.target.result + '\n'
+                        }
+                    }))
+                })
             }
         }
         ws.onclose = function (e) {
