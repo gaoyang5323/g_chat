@@ -3,41 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <title>chat</title>
+    <style>
+        body {
+            background-image: url("http://data.kakuiwong.cn/chat_background2.jpg");
+            background-size: cover;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        section {
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
 </head>
 <body>
-<div>
-    <textarea style="height: 200px;width: 300px" id="history_content"></textarea>
-</div>
-<div>
-    <select id="token">
-        <option>01</option>
-        <option>02</option>
-        <option>03</option>
-        <option>04</option>
-        <option>05</option>
-        <option>10</option>
-        <option>20</option>
-    </select>
+<section>
+    <div>
+        <p><input id="status" disabled style="width: 80px;height: 20px;color: red"></input></p>
+        <textarea style="height: 200px;width: 500px" id="history_content" disabled></textarea>
+        <p>
+            <button onclick="loginWs()" style="background: green;color: aliceblue;border-radius: 8px">登录服务器</button>
+        </p>
 
-    <input type="text" id="content"></input>
+        <span style="font-size: 0.5em">当前用户TOKEN</span>
+        <select id="token">
+            <option>01</option>
+            <option>02</option>
+            <option>03</option>
+            <option>04</option>
+            <option>05</option>
+            <option>10</option>
+            <option>20</option>
+        </select>
 
-    <select id="recipientId">
-        <option>01</option>
-        <option>02</option>
-        <option>03</option>
-        <option>04</option>
-        <option>05</option>
-        <option>10</option>
-        <option>20</option>
-    </select>
-    <input type="file" multiple="multiple" style="width: 70px" id="upload" onchange="imgSend()"></input>
-    <button onclick="loginWs()">登录ws</button>
-    <button onclick="send()">发送</button>
-    <span id="status"></span>
-    <img id="img" height="90px" width="90px">
-    <!--  <div style="border: 1px solid #CCC;height: 300px;overflow: scroll" id="server-msg-container">-->
-</div>
+        <span style="font-size: 0.5em">接收者ID</span>
+        <select id="recipientId">
+            <option>01</option>
+            <option>02</option>
+            <option>03</option>
+            <option>04</option>
+            <option>05</option>
+            <option>10</option>
+            <option>20</option>
+        </select>
 
+        <input type="text" id="content"></input>
+
+        <button onclick="send()" style="background: black;color: white;border-radius: 8px">发送</button>
+        <p style="background: black;width: 70px;color: white"><input type="file" multiple="multiple"
+                                                                     style="width: 70px;opacity:70%"
+                                                                     id="upload" onchange="imgSend()"></input></p>
+
+        <p><img id="img" height="90px" width="90px"></p>
+        <!--  <div style="border: 1px solid #CCC;height: 300px;overflow: scroll" id="server-msg-container">-->
+    </div>
+</section>
 
 <script>
     let wsStatus = 0;
@@ -98,7 +125,7 @@
     function webSocket(token) {
         if ("WebSocket" in window) {
             statusMsg("支持websocket")
-            // return new WebSocket("ws://47.92.244.187:9898/chat?token=" + token); //创建WebSocket连接
+            //  return new WebSocket("ws://47.92.244.187:9898/chat?token=" + token); //创建WebSocket连接
             return new WebSocket("ws://localhost:9898/chat?token=" + token); //创建WebSocket连接
         } else {
             alert("不支持websocket")
@@ -119,25 +146,30 @@
                 let type = binData.slice(0, 4)
                 let senderId = binData.slice(4, 6)
                 let message = binData.slice(6)
+                let history = document.getElementById('history_content')
                 new Promise(resolve => {
                     let reader = new FileReader()
                     reader.readAsArrayBuffer(type)
                     reader.onload = function (event) {
-                        resolve('消息类型: ' + new DataView(event.target.result).getInt32(0) + '|')
+                        let type = new DataView(event.target.result).getInt32(0);
+                        if (type == '-100') {
+                            history.value = history.value + '对方用户离线状态' + '\n'
+                            return
+                        }
+                        resolve('消息类型: ' + type + '|')
                     }
                 }).then((type) => {
                     new Promise(resolve => {
                         let reader = new FileReader()
                         reader.readAsText(senderId)
                         reader.onload = function (event) {
-                            resolve(type + '发送人为: ' + event.target.result + '|')
+                            resolve(type + '发送人ID: ' + event.target.result + '|')
                         }
                     }).then((senderId => {
                         let reader = new FileReader()
                         reader.readAsText(message)
                         reader.onload = function (event) {
-                            let history = document.getElementById('history_content')
-                            history.value = history.value + senderId + '内容: ' + event.target.result + '\n'
+                            history.value = history.value + senderId + '接收的信息: ' + event.target.result + '\n'
                         }
                     }))
                 })
@@ -154,7 +186,7 @@
     }
 
     function statusMsg(e) {
-        document.getElementById('status').innerText = e
+        document.getElementById('status').value = e
     }
 </script>
 </body>
