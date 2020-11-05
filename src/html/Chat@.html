@@ -125,8 +125,8 @@
     function webSocket(token) {
         if ("WebSocket" in window) {
             statusMsg("支持websocket")
-            //  return new WebSocket("ws://47.92.244.187:9898/chat?token=" + token); //创建WebSocket连接
-            return new WebSocket("ws://localhost:9898/chat?token=" + token); //创建WebSocket连接
+              return new WebSocket("ws://47.92.244.187:9898/chat?token=" + token); //创建WebSocket连接
+           // return new WebSocket("ws://localhost:9898/chat?token=" + token); //创建WebSocket连接
         } else {
             alert("不支持websocket")
         }

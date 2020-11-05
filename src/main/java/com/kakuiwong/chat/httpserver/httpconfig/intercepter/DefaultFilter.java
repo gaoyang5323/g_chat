@@ -22,7 +22,7 @@ public class DefaultFilter implements Filter {
         response.setHeader("Access-Control-Allow-Methods", "POST, PUT, GET, OPTIONS, DELETE");
         response.setHeader("Access-Control-Max-Age", "3600");
         response.setHeader("Access-Control-Allow-Headers",
-                "Origin, X-Requested-With, Content-Type, Accept, uuid,sign,timestamp,requestt");
+                "Origin, X-Requested-With, Content-Type, Accept, userId,sign,timestamp");
         response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
         response.setHeader("Pragma", "no-cache");
         if (RequestMethod.OPTIONS.toString().equalsIgnoreCase(request.getMethod())) {

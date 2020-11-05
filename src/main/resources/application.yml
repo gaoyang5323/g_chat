@@ -5,4 +5,4 @@ netty:
     maxFramePayloadLength: 5242880 #最大支持传输的包大小5M
     recipientIdLength: 2 #消息接收者用户id长度
 server:
-  port: 8080
+  port: 8081
