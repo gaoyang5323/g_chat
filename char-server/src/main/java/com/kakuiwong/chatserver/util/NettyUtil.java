@@ -1,10 +1,14 @@
 package com.kakuiwong.chatserver.util;
 
-import com.kakuiwong.chatserver.model.enums.WebSocketMessageTypeEnum;
+import com.kakuiwong.model.enums.WebSocketMessageTypeEnum;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import org.springframework.util.StringUtils;
 
@@ -32,6 +36,10 @@ public final class NettyUtil {
     private static final Map<String, String> USERID_CUSTOMER_SERVICE_USERID = new ConcurrentHashMap();
     //客服用户id对应的接待用户列表
     private static Map<String, List<String>> CUSTOMER_SERVICE_USERIDLIST = new LinkedHashMap<>();
+
+    public static Channel getChannelByUserId(String userId) {
+        return ALL_USERID_CHANNEL.get(userId);
+    }
 
     //发送文本信息
     public static void sendTextByUserId(String senderId, String recipientId, String message, ChannelHandlerContext ctx) {

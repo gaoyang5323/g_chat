@@ -23,6 +23,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthWebSocketHandler extends ChannelInboundHandlerAdapter {
 
+    @Value("${netty.server.url}")
+    private String nettyUrl;
     @Value("${netty.server.uri}")
     private String nettyUri;
     @Value("${netty.server.maxFramePayloadLength}")
@@ -46,15 +48,15 @@ public class AuthWebSocketHandler extends ChannelInboundHandlerAdapter {
         if (!request.decoderResult().isSuccess() ||
                 !nettyUri.equals(uri) ||
                 !"websocket".equals(request.headers().get("Upgrade"))) {
-            sendErrorHttp(ctx);
+            sendErrorHttp(ctx, HttpResponseStatus.BAD_REQUEST);
             return;
         }
         if (!websocketAuthService.auth(ctx, request)) {
-            sendErrorHttp(ctx);
+            sendErrorHttp(ctx, HttpResponseStatus.UNAUTHORIZED);
             return;
         }
-        WebSocketServerHandshakerFactory handshakerFactory = new WebSocketServerHandshakerFactory(
-                "ws://localhost:9898/chat", null, true, maxFramePayloadLength);
+        WebSocketServerHandshakerFactory handshakerFactory = new WebSocketServerHandshakerFactory(nettyUrl,
+                null, true, maxFramePayloadLength);
         handshaker = handshakerFactory.newHandshaker(request);
         if (handshaker == null) {
             WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel());
@@ -63,8 +65,8 @@ public class AuthWebSocketHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    private void sendErrorHttp(ChannelHandlerContext ctx) {
-        ctx.writeAndFlush(new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.BAD_REQUEST)).
+    private void sendErrorHttp(ChannelHandlerContext ctx, HttpResponseStatus status) {
+        ctx.writeAndFlush(new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status)).
                 addListener(ChannelFutureListener.CLOSE);
     }
 

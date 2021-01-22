@@ -1,8 +1,8 @@
 netty:
   server:
-    port: 9898 #ws服务器端口号
+    url: ws://localhost:9090/chat  #客户端连接ws服务器地址
     uri: /chat  #客户端连接ws服务器地址
     maxFramePayloadLength: 5242880 #最大支持传输的包大小5M
-    recipientIdLength: 2 #消息接收者用户id长度
+    recipientIdLength: 18 #消息接收者用户id长度
 server:
   port: 8081

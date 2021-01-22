@@ -1,6 +1,9 @@
 package com.kakuiwong.chatserver.nettyserver;
 
-import com.kakuiwong.chatserver.nettyserver.nettyhandler.*;
+import com.kakuiwong.chatserver.nettyserver.nettyhandler.AuthWebSocketHandler;
+import com.kakuiwong.chatserver.nettyserver.nettyhandler.HeartBeatWebSocketHandler;
+import com.kakuiwong.chatserver.nettyserver.nettyhandler.TailWebSocketHandler;
+import com.kakuiwong.chatserver.nettyserver.nettyhandler.TextWebSocketHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -46,8 +49,6 @@ public class ChatServer {
     AuthWebSocketHandler authWebSocketHandler;
     @Autowired
     TailWebSocketHandler tailWebSocketHandler;
-    @Autowired
-    BinaryWebSocketHandler binaryWebSocketHandler;
 
     @PostConstruct
     public void start() {
@@ -83,7 +84,6 @@ public class ChatServer {
                                         .addLast(heartBeatWebSocketHandler)
                                         .addLast(authWebSocketHandler)
                                         .addLast(textWebSocketHandler)
-                                        .addLast(binaryWebSocketHandler)
                                         .addLast(tailWebSocketHandler);
                             }
                         });

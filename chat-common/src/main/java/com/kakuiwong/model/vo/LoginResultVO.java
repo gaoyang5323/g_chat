@@ -1,7 +1,7 @@
 package com.kakuiwong.model.vo;
 
 
-import com.kakuiwong.chatserver.model.po.XUser;
+import com.kakuiwong.model.po.XUser;
 
 /**
  * @author: gaoyang

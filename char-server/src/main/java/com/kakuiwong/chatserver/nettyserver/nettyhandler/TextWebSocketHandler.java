@@ -1,7 +1,7 @@
 package com.kakuiwong.chatserver.nettyserver.nettyhandler;
 
-import com.kakuiwong.chatserver.constant.XConstant;
 import com.kakuiwong.chatserver.util.NettyUtil;
+import com.kakuiwong.constant.XConstant;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
