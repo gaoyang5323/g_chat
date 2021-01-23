@@ -1,6 +1,6 @@
 package com.kakuiwong.httpserver.httpconfig.web;
 
-import com.kakuiwong.chatserver.model.vo.XResult;
+import com.kakuiwong.model.vo.XResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 

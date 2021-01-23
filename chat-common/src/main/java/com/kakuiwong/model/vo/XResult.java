@@ -1,6 +1,7 @@
 package com.kakuiwong.model.vo;
 
-import com.kakuiwong.chatserver.model.enums.HttpResultcodeEnum;
+
+import com.kakuiwong.model.enums.HttpResultcodeEnum;
 
 /**
  * @author: gaoyang

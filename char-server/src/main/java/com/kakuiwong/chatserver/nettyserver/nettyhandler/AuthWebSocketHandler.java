@@ -2,6 +2,7 @@ package com.kakuiwong.chatserver.nettyserver.nettyhandler;
 
 import com.kakuiwong.chatserver.service.WebsocketAuthService;
 import com.kakuiwong.chatserver.util.NettyUtil;
+import com.kakuiwong.service.UserChannelService;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -31,6 +32,8 @@ public class AuthWebSocketHandler extends ChannelInboundHandlerAdapter {
     private Integer maxFramePayloadLength;
     @Autowired
     WebsocketAuthService websocketAuthService;
+    @Autowired
+    UserChannelService userChannelService;
 
     private WebSocketServerHandshaker handshaker;
 
@@ -40,6 +43,25 @@ public class AuthWebSocketHandler extends ChannelInboundHandlerAdapter {
             handleHttpRequest(ctx, (FullHttpRequest) msg);
         } else if (msg instanceof WebSocketFrame) {
             handleWebSocket(ctx, (WebSocketFrame) msg);
+        }
+    }
+
+    @Override
+    public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
+        super.handlerRemoved(ctx);
+        String userId = NettyUtil.getUserIdByChannelId(ctx.channel().id().asLongText());
+        if (userId != null) {
+            userChannelService.offLine(userId,nettyUrl);
+        }
+        NettyUtil.userOffline(ctx.channel().id().asLongText());
+    }
+
+    @Override
+    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+        super.channelRegistered(ctx);
+        String userId = NettyUtil.getUserIdByChannelId(ctx.channel().id().asLongText());
+        if (userId != null) {
+            userChannelService.online(userId, nettyUrl);
         }
     }
 
@@ -68,12 +90,6 @@ public class AuthWebSocketHandler extends ChannelInboundHandlerAdapter {
     private void sendErrorHttp(ChannelHandlerContext ctx, HttpResponseStatus status) {
         ctx.writeAndFlush(new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status)).
                 addListener(ChannelFutureListener.CLOSE);
-    }
-
-    @Override
-    public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
-        super.handlerRemoved(ctx);
-        NettyUtil.userOffline(ctx.channel().id().asLongText());
     }
 
     private void handleWebSocket(ChannelHandlerContext ctx, WebSocketFrame frame) {

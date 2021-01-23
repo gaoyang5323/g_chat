@@ -40,7 +40,7 @@ public class HeartBeatWebSocketHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    public static String parseChannelRemoteAddr(final Channel channel) {
+    private   String parseChannelRemoteAddr(final Channel channel) {
         if (null == channel) {
             return "";
         }

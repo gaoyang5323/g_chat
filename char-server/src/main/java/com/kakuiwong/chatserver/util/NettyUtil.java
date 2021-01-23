@@ -4,11 +4,7 @@ import com.kakuiwong.model.enums.WebSocketMessageTypeEnum;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import org.springframework.util.StringUtils;
 
@@ -84,6 +80,13 @@ public final class NettyUtil {
         Resultbuffer.writeInt(WebSocketMessageTypeEnum.OFFLINE.getType());
         ctx.writeAndFlush(new BinaryWebSocketFrame(Resultbuffer));
         return true;
+    }
+
+    public static void sendOffLine(ChannelHandlerContext ctx,String senderId) {
+        ByteBuf buffer = Unpooled.buffer();
+        buffer.writeInt(WebSocketMessageTypeEnum.OFFLINE.getType());
+        buffer.writeBytes(senderId.getBytes());
+        ctx.writeAndFlush(new BinaryWebSocketFrame(buffer));
     }
 
     //用户下线

@@ -1,8 +1,24 @@
 netty:
   server:
-    url: ws://localhost:9090/chat  #客户端连接ws服务器地址
+    port: 8888
+    url: ws://localhost:8888/chat  #客户端连接ws服务器地址
     uri: /chat  #客户端连接ws服务器地址
     maxFramePayloadLength: 5242880 #最大支持传输的包大小5M
     recipientIdLength: 18 #消息接收者用户id长度
-server:
-  port: 8081
+spring:
+  redis:
+    host: 39.98.141.41
+    port: 6389
+    password: yaojies#@!456
+    # 连接超时时间（毫秒）
+    timeout: 10000
+    jedis:
+      pool:
+        # 连接池中的最大空闲连接
+        max-idle: 8
+        # 连接池中的最小空闲连接
+        min-idle: 10
+        # 连接池最大连接数（使用负值表示没有限制）
+        max-active: 100
+        # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-wait: -1

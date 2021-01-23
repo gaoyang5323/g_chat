@@ -1,6 +1,7 @@
 package com.kakuiwong.model.enums;
 
-import com.kakuiwong.chatserver.model.XException;
+
+import com.kakuiwong.model.XException;
 
 /**
  * @author: gaoyang

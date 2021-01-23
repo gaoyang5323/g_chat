@@ -5,6 +5,7 @@ package com.kakuiwong.model.po;
  * @Description:
  */
 public class XUser {
+    private String userId;
     private String username;
     private String password;
     private String name;
@@ -15,6 +16,14 @@ public class XUser {
         this.password = password;
         this.name = name;
         this.isCustomerServiceUser = isCustomerServiceUser;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getPassword() {
