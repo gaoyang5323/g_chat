@@ -4,6 +4,7 @@ import com.kakuiwong.httpserver.service.UserService;
 import com.kakuiwong.model.po.XUser;
 import com.kakuiwong.model.vo.XResult;
 import com.kakuiwong.service.UserChannelService;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,8 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     UserChannelService userChannelService;
+    @Autowired
+    RabbitTemplate rabbitTemplate;
 
     private Map<String, XUser> testUserMap = new HashMap<>();
 
@@ -55,7 +58,7 @@ public class UserServiceImpl implements UserService {
         String hostByUserId = userChannelService.getHostByUserId(user.getUserId());
         if (hostByUserId != null) {
             //TODO 登录时判断是否已经连接中,有则踢出,并发送mq下线该用户连接
-
+            //rabbitTemplate
         }
         String token = UUID.randomUUID().toString();
         userChannelService.login(token, user);
@@ -84,7 +87,7 @@ public class UserServiceImpl implements UserService {
                     get().
                     getKey();
         } else {
-            if (adder.longValue() > 20) {
+            if (adder.longValue() > 10) {
                 String hostTemp = host;
                 host = null;
                 adder.reset();

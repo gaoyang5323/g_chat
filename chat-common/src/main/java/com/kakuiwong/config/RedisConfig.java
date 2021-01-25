@@ -17,6 +17,7 @@ import java.net.UnknownHostException;
 @Configuration
 public class RedisConfig {
 
+    @SuppressWarnings("all")
     @Bean
     @ConditionalOnMissingBean(RedisTemplate.class)
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory)
@@ -31,6 +32,7 @@ public class RedisConfig {
         return template;
     }
 
+    @SuppressWarnings("all")
     @Bean
     @ConditionalOnMissingBean(StringRedisTemplate.class)
     public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory redisConnectionFactory)
